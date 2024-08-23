@@ -1,0 +1,29 @@
+services:
+  ocserv:
+    image: quay.io/aminvakil/ocserv
+    container_name: ocserv
+    sysctls:
+      - net.ipv4.ip_forward=1
+    cap_add:
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges
+    ports:
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      - LETSENCRYPT_DOMAIN=${LETSENCRYPT_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_RENEW=${LETSENCRYPT_RENEW}
+      - CAMOUFLAGE_SECRET=${CAMOUFLAGE_SECRET} 
+      - OCSERV_USER=${OCSERV_USER}
+      - OCSERV_PASS=${OCSERV_PASS}
+    volumes:
+      - ./config:/etc/ocserv
+    restart: unless-stopped
+    command: bash -c "
+      sed -i '/^camouflage = /{s/false/true/}' /etc/ocserv/ocserv.conf &&
+      sed -i '/^camouflage_secret = /{s/mysecretkey/${CAMOUFLAGE_SECRET}/}' /etc/ocserv/ocserv.conf &&
+      echo -e '${OCSERV_PASS}\n${OCSERV_PASS}' | ocpasswd -c /etc/ocserv/ocpasswd ${OCSERV_USER} &&
+      ocpasswd -c /etc/ocserv/ocpasswd -d test &&
+      ocserv -f -c /etc/ocserv/ocserv.conf"
