@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/6f6122c2-dfa9-4358-8358-1f0c3212e6e5)# ocserv-docker-compose
+# ocserv-docker-compose
 Docker compose for fast and easy ocserv configuration
 
 # How to start
